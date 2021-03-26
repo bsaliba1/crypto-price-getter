@@ -69,4 +69,4 @@ class PriceGetter {
 }
 
 module.exports = {PriceGetter}
-exports.ticker = PriceGetter
+exports.price_getter = PriceGetter
