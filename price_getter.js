@@ -16,7 +16,7 @@ class PriceGetter {
     return stats
   }
 
-  static async getLatestTrade(asset, base){
+  static async getLatestTradePrice(asset, base){
     const options = {
       asset: asset,
       base: base,
