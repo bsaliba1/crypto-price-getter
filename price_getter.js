@@ -30,7 +30,7 @@ class PriceGetter {
   static async get24hrPercentageChange(asset, base){
     const stats = await this.get24hrStats(asset, base);
     const openingPrice = parseFloat(stats["open"])
-    const latestPrice = await this.getLatestTrade(asset, base);
+    const latestPrice = await this.getLatestTradePrice(asset, base);
     return this.percentageChange(openingPrice, latestPrice)
 
   }
