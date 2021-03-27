@@ -1,6 +1,6 @@
 {
   "name": "crypto-price-getter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A crypto price price retriever which uses the Coinbase REST API to track prices in real time",
   "main": "price_getter.js",
   "scripts": {
