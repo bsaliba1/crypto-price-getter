@@ -9,6 +9,8 @@ npm un crypto-price-getter
 ```
 
 ## Usage
+## Reference
+All the asset and base pairs can be found in the `asset_base_pairs.txt` file
 ### Import
 ```
 const {PriceGetter} = require('crypto-price-getter')
