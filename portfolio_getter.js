@@ -1,15 +1,22 @@
 const crypto = require('crypto');
 const axios = require('axios');
 const defaultApiCredentials = require('./default_api_credentials');
+const { PriceGetter } = require('./price_getter')
 
 const requestOptions = {
   method: 'GET',
-  requestPath: '/accounts',
   url: 'https://api.pro.coinbase.com'
 }
 
-async function getPortfolio(key = defaultApiCredentials.key, secret = defaultApiCredentials.secret, passphrase = defaultApiCredentials.passphrase){
+async function getPortfolioBalance(key = defaultApiCredentials.key, secret = defaultApiCredentials.secret, passphrase = defaultApiCredentials.passphrase){
+  const assetAccounts = await getAssetAccounts(key, secret, passphrase);
+  const sumBalance = await sumAssetBalances(assetAccounts);
+  return sumBalance
+}
+
+async function getAssetAccounts(key = defaultApiCredentials.key, secret = defaultApiCredentials.secret, passphrase = defaultApiCredentials.passphrase){
   let options = {...requestOptions}
+  options.requestPath = '/accounts'
   options.key = key;
   options.secret = secret;
   options.passphrase = passphrase;
@@ -68,4 +75,33 @@ function getSignature(options, timestamp){
   return hmac.update(prehashString).digest('base64');
 }
 
-exports.getPortfolio = getPortfolio;
+async function sumAssetBalances(assetAccounts){
+  let sum = 0;
+  for (index in assetAccounts) {
+    const assetAccount = assetAccounts[index];
+    const assetBalance = parseFloat(assetAccount.balance);
+    const assetName = assetAccount.currency;
+    if (assetBalance == 0) {
+      continue;
+    }
+    if (assetName == 'USD' || assetName == 'USDC'){
+      sum = sum + assetBalance
+      continue;
+    }
+    try {
+      const assetPrice = await PriceGetter.getLatestTradePrice(assetAccount.currency, 'USD')
+      const dollarBalance = assetPrice * assetBalance;
+      sum = sum + dollarBalance;
+    } catch(error){
+      try {
+        const assetPrice = await PriceGetter.getLatestTradePrice(assetAccount.currency, 'USDC')
+        const dollarBalance = assetPrice * assetBalance;
+        sum = sum + dollarBalance
+      } catch {};
+    }
+  }
+  return Math.round(sum * 100) / 100
+}
+
+exports.getAssetAccounts = getAssetAccounts;
+exports.getPortfolioBalance = getPortfolioBalance;
