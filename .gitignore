@@ -2,4 +2,3 @@
 .vscode
 node_modules
 test_api_credentials.txt
-api_credentials.js
